@@ -1,7 +1,0 @@
-sentence-transformers
-python-docx
-faiss-cpu
-transformers
-fastapi
-uvicorn
-pydantic

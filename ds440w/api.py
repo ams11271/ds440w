@@ -2,15 +2,24 @@
 from fastapi import FastAPI, Request
 #Using pydantic's BaseModel to define the expected input data structure
 from pydantic import BaseModel
-
+from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
-from main import X_train, mappings, scaler, train_logistic_model, y_train
-from feature_engineering import create_features_apply
+from main import X_training_data, train_logistic_model, y_training_labels
+
 
 #called it and stored in the logistic_model variable to make predictions
-logistic_model=train_logistic_model(X_train, y_train)
+logistic_model=train_logistic_model(X_training_data, y_training_labels)
 
 app=FastAPI()
+
+#allows any origin
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 #The class defines the input schema for predictions and includes various types of fields.Pydantic is being used to help with validating data
 class HealthcareInput(BaseModel):
@@ -30,14 +39,6 @@ def predict(input: HealthcareInput):
     #converting the pydantic model to a dictionary and then converting it to a dataframe for processing
     df=pd.DataFrame([input.dict()])
 
-    #applyed feature engineering
-    transformed = create_features_apply(df, mappings, scaler,
-                                         numerical_columns=[
-                                             'age', 'hypertension', 'heart_disease',
-                                             'bmi', 'HbA1c_level', 'blood_glucose_level'
-                                         ],
-                                         categorical_columns=['gender', 'smoking_history'])
-
     # Predict using trained model based on the transformed features
-    prediction = logistic_model.predict(transformed)[0]
+    prediction = logistic_model.predict
     return {"prediction": int(prediction)}

@@ -10,6 +10,7 @@ target_column = 'diabetes'
 numerical_columns = ['age', 'hypertension', 'heart_disease', 'bmi', 'HbA1c_level', 'blood_glucose_level']
 categorical_columns = ['gender', 'smoking_history']
 
+
 # Load data with explicit naming
 X_training_data, X_testing_data, X_validation_data, y_training_labels, y_testing_labels, y_validation_labels = load_data(file_path, target_column)
 
@@ -24,6 +25,7 @@ X_validation_data = create_features_apply(X_validation_data, mappings, scaler, n
 logistic_model = train_logistic_model(X_training_data, y_training_labels)
 rf_model = train_random_forest(X_training_data, y_training_labels)
 xgb_model = train_xgboost_model(X_training_data, y_training_labels)
+
 
 # Evaluate models on the testing set
 print("Evaluation on Testing Set:")
@@ -42,3 +44,4 @@ xgb_val_metrics = evaluate_model(xgb_model, X_validation_data, y_validation_labe
 print("Logistic Regression Validation Metrics:", logistic_val_metrics)
 print("Random Forest Validation Metrics:", rf_val_metrics)
 print("XGBoost Validation Metrics:", xgb_val_metrics)
+

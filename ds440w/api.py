@@ -35,6 +35,7 @@ class HealthcareInput(BaseModel):
 @app.post("/predict")
 def predict(input: HealthcareInput):
     import pandas as pd
+    
     #converting the pydantic model to a dictionary and then converting it to a dataframe for processing
     df=pd.DataFrame([input.dict()])
 
@@ -42,4 +43,36 @@ def predict(input: HealthcareInput):
     # Predict using trained model based on the transformed features
     prediction = model.predict(df_transformed)[0]
 
-    return {"prediction": int(prediction)}
+    if prediction == 0:
+        risk_level = "Low Risk"
+        message = "You are not diabetic"
+    else:
+        risk_level = "High Risk"
+        message = "You are diabetic"
+    
+    gender= input.gender
+    age= input.age
+    hypertension = input.hypertension
+    heart_disease = input.heart_disease
+    smoking_history = input.smoking_history
+    bmi = input.bmi
+    HbA1c_level = input.HbA1c_level
+    blood_glucose_level = input.blood_glucose_level
+
+    recommendations= []
+
+    if bmi > 30:
+        recommendations.append("Your BMI suggests obesity. Consider consulting a nutritionist.")
+    if HbA1c_level > 6.4:
+        recommendations.append("Your HbA1c level is high. Regular exercise and medication may help.")
+    if blood_glucose_level > 140:
+        recommendations.append("High blood glucose detected. Reduce sugar intake.")
+    if hypertension == 1:
+        recommendations.append("Manage hypertension through low-sodium diets and regular walks.")
+    if smoking_history.lower() == "current":
+        recommendations.append("Quitting smoking can reduce diabetes complications.")
+    if age > 50:
+        recommendations.append("Annual eye and foot exams are recommended for seniors.")
+
+    return {"prediction": int(prediction), "risk_level": risk_level, "message": message, "recommendations": recommendations}
+

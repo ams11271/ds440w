@@ -1,6 +1,5 @@
-// prediction_screen.dart
 import 'package:flutter/material.dart';
-import 'api_service.dart'; // Ensure this file is in the same folder
+import 'api_service.dart';
 
 class PredictionScreen extends StatefulWidget {
   @override
@@ -10,7 +9,7 @@ class PredictionScreen extends StatefulWidget {
 class _PredictionScreenState extends State<PredictionScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  // Controllers for input fields
+  // Controllers for form fields
   final TextEditingController ageController = TextEditingController();
   final TextEditingController hypertensionController = TextEditingController();
   final TextEditingController heartDiseaseController = TextEditingController();
@@ -20,11 +19,11 @@ class _PredictionScreenState extends State<PredictionScreen> {
   final TextEditingController genderController = TextEditingController();
   final TextEditingController smokingHistoryController = TextEditingController();
 
-  String predictionResult = "";
+  String predictionResult = '';
+  List<dynamic> recommendations = [];
 
   void _predict() async {
     if (_formKey.currentState!.validate()) {
-      // Build input data from the form values
       final inputData = {
         'age': double.parse(ageController.text),
         'hypertension': int.parse(hypertensionController.text),
@@ -37,14 +36,15 @@ class _PredictionScreenState extends State<PredictionScreen> {
       };
 
       try {
-        int prediction = await getPrediction(inputData);
+        final result = await getPrediction(inputData);
         setState(() {
-          // Assuming 1 means diabetic and 0 means not diabetic
-          predictionResult = prediction == 1 ? "This person is Diabetic" : "This person is not diabetic";
+          predictionResult = '${result['risk_level']} — ${result['message']}';
+          recommendations = result['recommendations'];
         });
       } catch (e) {
         setState(() {
-          predictionResult = "Error: ${e.toString()}";
+          predictionResult = 'Error: ${e.toString()}';
+          recommendations = [];
         });
       }
     }
@@ -63,6 +63,15 @@ class _PredictionScreenState extends State<PredictionScreen> {
     super.dispose();
   }
 
+  Widget _buildTextField(String label, TextEditingController controller, {bool isNumber = false}) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(labelText: label),
+      keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+      validator: (value) => value == null || value.isEmpty ? 'Please enter $label' : null,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,62 +82,29 @@ class _PredictionScreenState extends State<PredictionScreen> {
           key: _formKey,
           child: ListView(
             children: [
-              TextFormField(
-                controller: ageController,
-                decoration: InputDecoration(labelText: "Age"),
-                keyboardType: TextInputType.number,
-                validator: (value) => value == null || value.isEmpty ? "Please enter age" : null,
-              ),
-              TextFormField(
-                controller: hypertensionController,
-                decoration: InputDecoration(labelText: "Hypertension (0 or 1)"),
-                keyboardType: TextInputType.number,
-                validator: (value) => value == null || value.isEmpty ? "Please enter hypertension value" : null,
-              ),
-              TextFormField(
-                controller: heartDiseaseController,
-                decoration: InputDecoration(labelText: "Heart Disease (0 or 1)"),
-                keyboardType: TextInputType.number,
-                validator: (value) => value == null || value.isEmpty ? "Please enter heart disease value" : null,
-              ),
-              TextFormField(
-                controller: bmiController,
-                decoration: InputDecoration(labelText: "BMI"),
-                keyboardType: TextInputType.number,
-                validator: (value) => value == null || value.isEmpty ? "Please enter BMI" : null,
-              ),
-              TextFormField(
-                controller: hba1cController,
-                decoration: InputDecoration(labelText: "HbA1c Level"),
-                keyboardType: TextInputType.number,
-                validator: (value) => value == null || value.isEmpty ? "Please enter HbA1c level" : null,
-              ),
-              TextFormField(
-                controller: bloodGlucoseController,
-                decoration: InputDecoration(labelText: "Blood Glucose Level"),
-                keyboardType: TextInputType.number,
-                validator: (value) => value == null || value.isEmpty ? "Please enter blood glucose level" : null,
-              ),
-              TextFormField(
-                controller: genderController,
-                decoration: InputDecoration(labelText: "Gender"),
-                validator: (value) => value == null || value.isEmpty ? "Please enter gender" : null,
-              ),
-              TextFormField(
-                controller: smokingHistoryController,
-                decoration: InputDecoration(labelText: "Smoking History"),
-                validator: (value) => value == null || value.isEmpty ? "Please enter smoking history" : null,
-              ),
+              _buildTextField("Age", ageController, isNumber: true),
+              _buildTextField("Hypertension (0 or 1)", hypertensionController, isNumber: true),
+              _buildTextField("Heart Disease (0 or 1)", heartDiseaseController, isNumber: true),
+              _buildTextField("BMI", bmiController, isNumber: true),
+              _buildTextField("HbA1c Level", hba1cController, isNumber: true),
+              _buildTextField("Blood Glucose Level", bloodGlucoseController, isNumber: true),
+              _buildTextField("Gender", genderController),
+              _buildTextField("Smoking History", smokingHistoryController),
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _predict,
                 child: Text("Predict"),
               ),
               SizedBox(height: 20),
-              Text(
-                predictionResult,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
+              if (predictionResult.isNotEmpty)
+                Text(
+                  predictionResult,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ...recommendations.map((tip) => ListTile(
+                    leading: Icon(Icons.check_circle_outline),
+                    title: Text(tip),
+                  )),
             ],
           ),
         ),
@@ -136,4 +112,3 @@ class _PredictionScreenState extends State<PredictionScreen> {
     );
   }
 }
-

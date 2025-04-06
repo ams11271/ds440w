@@ -21,6 +21,3 @@ X_validation_data = create_features_apply(X_validation_data, mappings, scaler, n
 xgb_model = train_xgboost_model(X_training_data, y_training_labels)
 
 xgb_metrics = evaluate_model(xgb_model, X_testing_data, y_testing_labels)
-
-expected_columns= X_training_data.columns
-print(expected_columns)

@@ -41,4 +41,17 @@ def predict(input: HealthcareInput):
     df_transformed= create_features_apply(df, mappings, scaler, numerical_columns, categorical_columns)
     # Predict using trained model based on the transformed features
     prediction = model.predict(df_transformed)[0]
+
+    gender=input.gender
+    age=input.age
+    hypertension=input.hypertension
+    heart_disease=input.heart_disease
+    smoking_history=input.smoking_history
+    bmi=input.bmi
+    Hba1c_level=input.HbA1c_level
+    blood_glucose_level=input.blood_glucose_level
+
+    if prediction == "1":
+
+
     return {"prediction": int(prediction)}

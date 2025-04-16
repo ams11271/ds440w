@@ -1,3 +1,11 @@
 flutter
 FastAPI
 fastapi-cors
+sqlalchemy
+psycopg2-binary
+alembic
+passlib[bcrypt]
+python-jose
+pandas
+scikit-learn
+xgboost

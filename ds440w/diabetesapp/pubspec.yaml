@@ -1,24 +1,19 @@
-name: diabetesapp
-description: "A new Flutter project."
-publish_to: 'none' 
-
-version: 1.0.0+1
-
+name: diabetes_web_app
+description: Web app for diabetes prediction & history
+publish_to: "none"
 environment:
-  sdk: ^3.7.2
-
+  sdk: ">=2.17.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
+  http: ^0.13.6
+  flutter_secure_storage: ^8.1.0
+  # bump this to the latest:
+  fl_chart: ^0.71.0
 
-  cupertino_icons: ^1.0.8
-  http: ^0.13.5
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
-
-flutter:
-  uses-material-design: true

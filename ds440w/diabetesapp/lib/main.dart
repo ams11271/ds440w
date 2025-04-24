@@ -44,4 +44,3 @@ class DiabetesApp extends StatelessWidget {
     );
   }
 }
-

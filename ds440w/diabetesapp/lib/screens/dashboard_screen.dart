@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../auth_service.dart';
 import '../api_service.dart';
 import '../models/prediction_record.dart';
@@ -49,7 +50,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Add a drawer with Logout
       drawer: Drawer(
         child: SafeArea(
           child: Column(
@@ -63,10 +63,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
       ),
-
       appBar: AppBar(
         title: const Text('Dashboard'),
-        // Also put a logout icon button on the AppBar
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -75,58 +73,139 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-
       body: loading
           ? const Center(child: CircularProgressIndicator())
-          : Row(
-              children: [
-                // Left panel: form + history
-                Expanded(
-                  flex: 2,
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+          : Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Left panel: form + history
+                  Expanded(
+                    flex: 2,
+                    child: ListView(
                       children: [
-                        PredictionForm(onResult: _onNewResult),
-                        if (lastResult != null) ...[
-                          const SizedBox(height: 20),
-                          Text(
-                            '${lastResult!['risk_level']} — ${lastResult!['message']}',
-                            style: const TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                        // Prediction form
+                        Card(
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          ...List<Widget>.from(
-                            (lastResult!['recommendations'] as List)
-                                .map((tip) => ListTile(
-                                      leading: const Icon(Icons.check),
-                                      title: Text(tip),
-                                    )),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: PredictionForm(onResult: _onNewResult),
                           ),
-                          const Divider(height: 40),
-                        ],
-                        const Text('History',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold)),
-                        ...history.map((r) => ListTile(
-                              title: Text(
-                                  '${r.createdAt.toLocal().toString().split(" ")[0]} → ${r.result == 1 ? 'Diabetic' : 'Not Diabetic'}'),
-                              subtitle: Text(r.recommendations.join('; ')),
-                            )),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        // Latest result callout
+                        if (lastResult != null)
+                          Card(
+                            color: Colors.green.shade50,
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${lastResult!['risk_level']} — ${lastResult!['message']}',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.green.shade800,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  ...List<Widget>.from(
+                                    (lastResult!['recommendations'] as List)
+                                        .map((tip) => Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Icon(Icons.check,
+                                                    size: 20,
+                                                    color:
+                                                        Colors.green.shade700),
+                                                const SizedBox(width: 8),
+                                                Expanded(child: Text(tip)),
+                                              ],
+                                            )),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                        const SizedBox(height: 20),
+
+                        // History panel
+                        Text('History',
+                            style: Theme.of(context).textTheme.titleLarge),
+                        const SizedBox(height: 8),
+                        ExpansionPanelList.radio(
+                          children: history.asMap().entries.map((entry) {
+                            final idx = entry.key;
+                            final rec = entry.value;
+                            return ExpansionPanelRadio(
+                              value: idx,
+                              headerBuilder: (_, __) => ListTile(
+                                dense: true,
+                                title: Text(
+                                  '${DateFormat.yMd().format(rec.createdAt)} → ${rec.result == 1 ? 'Diabetic' : 'Not Diabetic'}',
+                                  style: TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                              ),
+                              body: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 8),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: rec.recommendations
+                                      .map((tip) => Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 4),
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.arrow_right,
+                                                    size: 18,
+                                                    color: Colors.blueGrey),
+                                                const SizedBox(width: 6),
+                                                Expanded(child: Text(tip)),
+                                              ],
+                                            ),
+                                          ))
+                                      .toList(),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
                       ],
                     ),
                   ),
-                ),
 
-                // Right panel: chart
-                Expanded(
-                  flex: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: PredictionChart(data: history),
+                  const SizedBox(width: 16),
+
+                  // Right panel: chart
+                  Expanded(
+                    flex: 1,
+                    child: Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: PredictionChart(data: history),
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
     );
   }

@@ -11,6 +11,7 @@ dependencies:
   flutter_secure_storage: ^8.1.0
   # bump this to the latest:
   fl_chart: ^0.71.0
+  intl: ^0.17.0
 
 
 

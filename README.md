@@ -2,7 +2,7 @@
 
 A full-stack diabetes risk prediction platform that combines an **XGBoost machine learning model**, a **FastAPI backend with JWT authentication**, and a **Flutter cross-platform frontend**. Users create accounts, input health metrics, receive real-time risk assessments with personalized recommendations, and track their prediction history over time.
 
-> Built as a capstone project for DS 440W at Penn State.
+> Built as a capstone project demonstrating end-to-end ML application development.
 
 ---
 
@@ -289,4 +289,4 @@ flutter run -d chrome
 
 ## About
 
-Built as a **capstone project for DS 440W** at Penn State, this project demonstrates the full lifecycle of a production ML application — from data preprocessing and model training through API development, database design, authentication, and cross-platform frontend delivery. It reflects real-world software engineering practices: modular architecture, secure authentication, database migrations, and a clean separation between the ML pipeline and the serving layer.
+Built as a **capstone project**, this application demonstrates the full lifecycle of a production ML application — from data preprocessing and model training through API development, database design, authentication, and cross-platform frontend delivery. It reflects real-world software engineering practices: modular architecture, secure authentication, database migrations, and a clean separation between the ML pipeline and the serving layer.

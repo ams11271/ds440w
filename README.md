@@ -6,14 +6,6 @@ A full-stack diabetes risk prediction platform that combines an **XGBoost machin
 
 ---
 
-## Live Demo
-
-![Dashboard Preview](https://img.shields.io/badge/Platform-Web%20%7C%20iOS%20%7C%20Android%20%7C%20Desktop-blue)
-
-**User Flow:** Sign Up → Log In → Enter Health Metrics → Get Prediction + Recommendations → View History & Trends
-
----
-
 ## System Architecture
 
 ```
